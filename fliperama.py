@@ -19,6 +19,8 @@
 # from tkinter.tix import Tree
 # from matplotlib.pyplot import text
 # from black import diff
+from turtle import position
+from leaderboard import *
 import pygame
 from pygame.locals import *
 from sys import exit
@@ -99,10 +101,37 @@ def main_menu():
         clock.tick(60)
 
 def leaderboards():
+    leader_board = LeaderBoard()
+    scores = leader_board.get(1)
     running = True
     while running:
         screen.fill((0, 0, 0))
-        draw_text('LeaderBoard', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 100)
+        draw_text('LeaderBoard', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 50)
+
+        y = 150
+        x = (WIDTH/3)-50
+        for i in range(1, 12):
+            if (i == 1):
+                position = "1ST"
+            elif (i == 2):
+                position = "2ND"
+            elif (i == 3):
+                position = "3RD"
+            else:
+                position = str(i) + "TH"
+            draw_text(position, 'assets/PressStart2P.ttf', 20, 'Green', screen, x, y)
+            y = y + 50
+
+        y = 150
+        for player in scores:
+            x = (WIDTH/3)+50
+            for item in player:
+                # print("player: ", player, " item: ", item)
+                draw_text(str(item), 'assets/PressStart2P.ttf', 20, 'Green', screen, x, y)
+
+                x = x + 100
+            y = y + 50
+                
 
         for event in pygame.event.get():
             if (event.type == QUIT):
