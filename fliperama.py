@@ -207,7 +207,10 @@ def select_difficult():
 
 def insert_name():
     # difficult = 0
+    char_list = "AabCcdEFGHIJkLMnOoPqrStUuVWXyZ012345689 "
+    select = 0
     click = False
+    char_index = [0, 0, 0]
     running = True
     while running:
         screen.fill((0, 0, 0))
@@ -215,30 +218,52 @@ def insert_name():
 
         mx, my = pygame.mouse.get_pos()
 
-        # if (difficult > 0):
-        #     draw_text('Difficult '+ str(difficult), 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 200)
-
         button_1 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
         button_2 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
         button_3 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
         button_4 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
 
+
+        if (select == 0):
+            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2, 200)
+            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 50, 200)
+            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 100, 200)
+        
+        elif (select == 1):
+            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 200)
+            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 + 50, 200)
+            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 100, 200)
+
+        else:
+            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 200)
+            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 50, 200)
+            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 + 100, 200)
+
+
         if (button_1.collidepoint((mx, my))):
             if (click):
-                pass
+                if (select != 0):
+                    select -= 1
+
         if (button_2.collidepoint((mx, my))):
             if (click):
-                pass
+                if (char_index[select] < len(char_list) - 1):
+                    char_index[select] += 1
+                else:
+                    char_index[select] = 0
 
         if (button_3.collidepoint((mx, my))):
             if (click):
-                pass
+                if (click):
+                    if (char_index[select] > 0):
+                        char_index[select] -= 1
+                    else:
+                        char_index[select] = len(char_list) - 1
 
         if (button_4.collidepoint((mx, my))):
             if (click):
-                pass
-
-
+                if (select != 2):
+                    select += 1
 
         pygame.draw.rect(screen, 'Green', button_1)
         pygame.draw.rect(screen, 'Yellow', button_2)
@@ -247,12 +272,16 @@ def insert_name():
 
         click = False
 
+        nickname = char_list[char_index[0]] + char_list[char_index[1]] + char_list[char_index[2]]
+
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
                 exit()
             if (event.type == KEYDOWN):
                 if (event.key == K_ESCAPE):
+                    running = False
+                if (event.key == K_RETURN):
                     running = False
             if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
@@ -264,6 +293,8 @@ def insert_name():
 
         pygame.display.update()
         clock.tick(60)
+
+    return nickname
 
 def game():
     diff = select_difficult()
@@ -331,7 +362,9 @@ def game():
         pygame.display.update()
         clock.tick(60)
 
-    insert_name()
+    nick = insert_name()
+    leader_board = LeaderBoard()
+    leader_board.add(nick, 999, diff)
 
 
 main_menu()
