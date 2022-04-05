@@ -18,8 +18,9 @@
 
 # from tkinter.tix import Tree
 # from matplotlib.pyplot import text
-from black import diff
+# from black import diff
 import pygame
+from pygame.locals import *
 from sys import exit
 
 WIDTH = 900
@@ -64,10 +65,10 @@ def main_menu():
         if (button_1.collidepoint((mx, my))):
             if (click):
                 # leaderboards()
-                insert_name()
+                game()
         if (button_2.collidepoint((mx, my))):
             if (click):
-                select_difficult()
+                leaderboards()
 
 
         pygame.draw.rect(screen, 'Red', button_1)
@@ -76,14 +77,14 @@ def main_menu():
         click = False
         
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT):
+            if (event.type == QUIT):
                 pygame.quit()
                 exit()
-            if (event.type == pygame.MOUSEBUTTONDOWN):
+            if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
                     click = True
                     clicking = [mx, my]
-            if (event.type == pygame.MOUSEBUTTONUP):
+            if (event.type == MOUSEBUTTONUP):
                 if (event.button == 1):
                     click = False
 
@@ -104,11 +105,11 @@ def leaderboards():
         draw_text('LeaderBoard', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 100)
 
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT):
+            if (event.type == QUIT):
                 pygame.quit()
                 exit()
-            if (event.type == pygame.KEYDOWN):
-                if (event.key == pygame.K_ESCAPE):
+            if (event.type == KEYDOWN):
+                if (event.key == K_ESCAPE):
                     running = False
 
         pygame.display.update()
@@ -138,12 +139,15 @@ def select_difficult():
         if (dif_1.collidepoint((mx, my))):
             if (click):
                 difficult = 1
+                return difficult
         if (dif_2.collidepoint((mx, my))):
             if (click):
                 difficult = 2
+                return difficult
         if (dif_3.collidepoint((mx, my))):
             if (click):
                 difficult = 3
+                return difficult
 
 
         pygame.draw.rect(screen, 'Green', dif_1)
@@ -153,17 +157,17 @@ def select_difficult():
         click = False
 
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT):
+            if (event.type == QUIT):
                 pygame.quit()
                 exit()
-            if (event.type == pygame.KEYDOWN):
-                if (event.key == pygame.K_ESCAPE):
+            if (event.type == KEYDOWN):
+                if (event.key == K_ESCAPE):
                     running = False
-            if (event.type == pygame.MOUSEBUTTONDOWN):
+            if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
                     click = True
                     clicking = [mx, my]
-            if (event.type == pygame.MOUSEBUTTONUP):
+            if (event.type == MOUSEBUTTONUP):
                 if (event.button == 1):
                     click = False
 
@@ -215,23 +219,90 @@ def insert_name():
         click = False
 
         for event in pygame.event.get():
-            if (event.type == pygame.QUIT):
+            if (event.type == QUIT):
                 pygame.quit()
                 exit()
-            if (event.type == pygame.KEYDOWN):
-                if (event.key == pygame.K_ESCAPE):
+            if (event.type == KEYDOWN):
+                if (event.key == K_ESCAPE):
                     running = False
-            if (event.type == pygame.MOUSEBUTTONDOWN):
+            if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
                     click = True
                     clicking = [mx, my]
-            if (event.type == pygame.MOUSEBUTTONUP):
+            if (event.type == MOUSEBUTTONUP):
                 if (event.button == 1):
                     click = False
 
         pygame.display.update()
         clock.tick(60)
 
+def game():
+    diff = select_difficult()
+    click = False
+    running = True
+    while running:
+
+        screen.fill((0, 0, 0))
+        draw_text('Difficult '+ str(diff) +' selected', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 50)
+
+        mx, my = pygame.mouse.get_pos()
+
+        led_1 = pygame.Rect((WIDTH-150)*1/8, 200, 150, 100)
+        led_2 = pygame.Rect((WIDTH-150)*3/8, 200, 150, 100)
+        led_3 = pygame.Rect((WIDTH-150)*5/8, 200, 150, 100)
+        led_4 = pygame.Rect((WIDTH-150)*7/8, 200, 150, 100)
+
+        button_1 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
+        button_2 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
+        button_3 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
+        button_4 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
+
+        if (button_1.collidepoint((mx, my))):
+            if (click):
+                running = False
+
+        if (button_2.collidepoint((mx, my))):
+            if (click):
+                pass
+
+        if (button_3.collidepoint((mx, my))):
+            if (click):
+                pass
+
+        if (button_4.collidepoint((mx, my))):
+            if (click):
+                pass
+
+        pygame.draw.rect(screen, 'Grey25', led_1)
+        pygame.draw.rect(screen, 'Grey25', led_2)
+        pygame.draw.rect(screen, 'Grey25', led_3)
+        pygame.draw.rect(screen, 'Grey25', led_4)
+
+        pygame.draw.rect(screen, 'Green', button_1)
+        pygame.draw.rect(screen, 'Yellow', button_2)
+        pygame.draw.rect(screen, 'Red', button_3)
+        pygame.draw.rect(screen, 'Blue', button_4)
+
+
+        for event in pygame.event.get():
+            if (event.type == QUIT):
+                pygame.quit()
+                exit()
+            if (event.type == KEYDOWN):
+                if (event.key == K_ESCAPE):
+                    running = False
+            if (event.type == MOUSEBUTTONDOWN):
+                if (event.button == 1):
+                    click = True
+                    clicking = [mx, my]
+            if (event.type == MOUSEBUTTONUP):
+                if (event.button == 1):
+                    click = False
+
+        pygame.display.update()
+        clock.tick(60)
+
+    insert_name()
 
 
 main_menu()
