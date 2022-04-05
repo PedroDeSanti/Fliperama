@@ -37,7 +37,7 @@ class LeaderBoard:
         self.db = self.client.get_database('fliperama_db')
         self.scores = self.db.score
 
-    def get(self):
+    def get(self, difficult):
         # here = os.path.dirname(os.path.abspath(__file__))
         # filename = os.path.join(here, "map.txt")
         # file = open(filename)
@@ -52,9 +52,28 @@ class LeaderBoard:
         #     content = file.readlines()
         #     for line in content:
         #         for char in line:
-        print(list(self.scores.find().sort("score", DESCENDING)))
+        player = []
+        score_list = []
 
-        #@TODO
+        # lista = list(self.scores.find({"difficult": difficult}).sort("score", DESCENDING))
+        lista = list(self.scores.find().sort("score", DESCENDING))
+        # print(lista[0])
+        for item in lista:
+            # print(item)
+            for field in item:
+                if (field == 'nick'):
+                    player.append(item[field])
+                if (field == 'score'):
+                    player.append(item[field])
+                # print("player: ", player)
+            score_list.append(player)
+            # print("score_list: ", score_list)
+            player = []
+            # print("score_list: ", score_list)
+        # print(lista)
+
+        # print("score_list: ", score_list)
+        return score_list
         #
 
         # return True
@@ -69,12 +88,16 @@ class LeaderBoard:
 # For testing:
 
 # leader_board = LeaderBoard()
+# lista = leader_board.get(1)
+# lista = leader_board.get(2)
+# lista = leader_board.get(3)
+# print(lista)
 
-# leader_board.add("Ped", 1000, 2)
-# leader_board.add("PCS", 1500, 1)
-# leader_board.add("BTS", 700, 0)
-# leader_board.add("Lei", 2000, 2)
-# leader_board.get()
+# leader_board.add("Deg", 9000, 1)
+# leader_board.add("lol", 6500, 1)
+# leader_board.add("Lin", 1700, 1)
+# leader_board.add("Aux", 12000, 1)
+# leader_board.get(2)
 
 
 #-m pip install "pymongo[srv]"
