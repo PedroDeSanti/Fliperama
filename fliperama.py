@@ -3,6 +3,11 @@ import pygame
 from pygame.locals import *
 from sys import exit
 # O PEDRO É MUITO LEGAL. SÓ O PEDRO.
+# O JOÃO É UM CARA MUITO.... MUITOO.... MUITO?
+
+
+
+# Inicialização
 WIDTH = 900
 HEIGH = 600
 
@@ -31,6 +36,7 @@ def draw_text (text, font, size, color, surface, x, y):
     text_rect.center = (x, y)
     surface.blit(text_surface, text_rect)
 
+# Tela inicial
 def main_menu():    
     while True:
         screen.fill((0, 0, 0))
@@ -42,6 +48,7 @@ def main_menu():
         button_1 = pygame.Rect((WIDTH-200)/2, 200, 200, 50)
         button_2 = pygame.Rect((WIDTH-200)/2, 300, 200, 50)
 
+        # se o jogador clica nos botões, vai para as tela correspondente (jogo ou ranking)
         if (button_1.collidepoint((mx, my))):
             if (click):
                 # leaderboards()
@@ -50,12 +57,13 @@ def main_menu():
             if (click):
                 leaderboards()
 
-
+        # Desenha os dois botões para jogo e ranking
         pygame.draw.rect(screen, 'Red', button_1)
         pygame.draw.rect(screen, 'Red', button_2)
 
         click = False
         
+        # Analisa os comandos do teclado para a tela MainMenu
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
@@ -78,14 +86,21 @@ def main_menu():
         pygame.display.update()
         clock.tick(60)
 
+# Tela de ranking (acessado via tela inicial)
 def leaderboards():
+
+    # obtém o ranking para o caso da dificuldade 1                                              MUDAR AQUI DEPOIS
     leader_board = LeaderBoard()
     scores = leader_board.get(1)
     running = True
+
+    # Enquanto o jogador não aperta ESC
     while running:
+        
         screen.fill((0, 0, 0))
         draw_text('LeaderBoard', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 50)
 
+        # Desenha na tela as 11 melhores pontuações
         y = 150
         x = (WIDTH/3)-50
         for i in range(1, 12):
@@ -100,6 +115,7 @@ def leaderboards():
             draw_text(position, 'assets/PressStart2P.ttf', 20, 'Green', screen, x, y)
             y = y + 50
 
+        # Escreve o nome e pontuação de cada jogador
         y = 150
         for player in scores:
             x = (WIDTH/3)+50
@@ -110,7 +126,7 @@ def leaderboards():
                 x = x + 100
             y = y + 50
                 
-
+        # Analisa as entradas do teclado para esta tela
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
@@ -125,24 +141,33 @@ def leaderboards():
 # global difficult
 # click = False
 
-
+# Tela de seleção de dificuldade (acessado via tela inicial)
 def select_difficult():
     difficult = 0
     click = False
     running = True
     while running:
         screen.fill((0, 0, 0))
-        draw_text('Select Difficult', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 100)
+        draw_text('Select Difficulty', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 100)
 
         mx, my = pygame.mouse.get_pos()
 
+        # escreve a dificuldade selecionada (assim que alguma for selecionada)
         if (difficult > 0):
-            draw_text('Difficult '+ str(difficult), 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 200)
+            draw_text('Difficulty '+ str(difficult), 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 200)
 
+        # desenha os botões correspondentes às dificuldades 
         dif_1 = pygame.Rect((WIDTH-200)*1/6, 300, 200, 100)
         dif_2 = pygame.Rect((WIDTH-200)*3/6, 300, 200, 100)
         dif_3 = pygame.Rect((WIDTH-200)*5/6, 300, 200, 100)
+        pygame.draw.rect(screen, 'Green', dif_1)
+        pygame.draw.rect(screen, 'Yellow', dif_2)
+        pygame.draw.rect(screen, 'Red', dif_3)
+        draw_text("Gugu Dadá", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*1/6+100, 350)
+        draw_text("Normal", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*3/6+100, 350)
+        draw_text("Doom", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*5/6+100, 350)
 
+        # verifica qual dificuldade foi selecionada
         if (dif_1.collidepoint((mx, my))):
             if (click):
                 difficult = 1
@@ -156,13 +181,9 @@ def select_difficult():
                 difficult = 3
                 return difficult
 
-
-        pygame.draw.rect(screen, 'Green', dif_1)
-        pygame.draw.rect(screen, 'Yellow', dif_2)
-        pygame.draw.rect(screen, 'Red', dif_3)
-
         click = False
 
+        # Analisa as entradas do teclado para esta tela
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
@@ -183,6 +204,7 @@ def select_difficult():
 
     return difficult
 
+# Tela de criação de nickname (acessado via tela de jogo)
 def insert_name():
     # difficult = 0
     char_list = "AabCcdEFGHIJkLMnOoPqrStUuVWXyZ012345689 "
@@ -190,67 +212,68 @@ def insert_name():
     click = False
     char_index = [0, 0, 0]
     running = True
+    # enquanto o jogador não aperta ESC ou return
     while running:
         screen.fill((0, 0, 0))
         draw_text('Insert Name', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 100)
 
         mx, my = pygame.mouse.get_pos()
 
+        # desenha os botões para as setas de criação de nickname
         button_1 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
         button_2 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
         button_3 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
         button_4 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
+        pygame.draw.rect(screen, 'Green', button_1)
+        pygame.draw.rect(screen, 'Yellow', button_2)
+        pygame.draw.rect(screen, 'Red', button_3)
+        pygame.draw.rect(screen, 'Blue', button_4)
 
-
+        # Define a cor dos caracteres mostrados a depender de qual está atualmente selecionado
         if (select == 0):
             draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2, 200)
             draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 50, 200)
-            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 100, 200)
-        
+            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 100, 200)    
         elif (select == 1):
             draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 200)
             draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 + 50, 200)
             draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 100, 200)
-
         else:
             draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 200)
             draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 50, 200)
             draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 + 100, 200)
 
-
+        # vai para a esquerda
         if (button_1.collidepoint((mx, my))):
             if (click):
                 if (select != 0):
                     select -= 1
-
+        # incrementa o caractere
         if (button_2.collidepoint((mx, my))):
             if (click):
                 if (char_index[select] < len(char_list) - 1):
                     char_index[select] += 1
                 else:
                     char_index[select] = 0
-
+        # decrementa o caractere
         if (button_3.collidepoint((mx, my))):
             if (click):
                 if (char_index[select] > 0):
                     char_index[select] -= 1
                 else:
                     char_index[select] = len(char_list) - 1
-
+        # vai para a direita
         if (button_4.collidepoint((mx, my))):
             if (click):
                 if (select != 2):
                     select += 1
 
-        pygame.draw.rect(screen, 'Green', button_1)
-        pygame.draw.rect(screen, 'Yellow', button_2)
-        pygame.draw.rect(screen, 'Red', button_3)
-        pygame.draw.rect(screen, 'Blue', button_4)
 
         click = False
 
         nickname = char_list[char_index[0]] + char_list[char_index[1]] + char_list[char_index[2]]
 
+        # Analisa as entradas do teclado para esta tela
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
@@ -273,6 +296,7 @@ def insert_name():
 
     return nickname
 
+# Tela de jogo (acessado via tela de seleção de dificuldade)
 def game():
     diff = select_difficult()
     click = False
@@ -294,40 +318,36 @@ def game():
         # test_rect = test_surface.get_rect()
         # screen.blit(test_surface, (x, y))
 
+
+        # Desenha os quadrados correspondentes aos leds
         led_1 = pygame.Rect((WIDTH-150)*1/8, 200, 150, 100)
         led_2 = pygame.Rect((WIDTH-150)*3/8, 200, 150, 100)
         led_3 = pygame.Rect((WIDTH-150)*5/8, 200, 150, 100)
         led_4 = pygame.Rect((WIDTH-150)*7/8, 200, 150, 100)
-
-        button_1 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
-        button_2 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
-        button_3 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
-        button_4 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
-
         pygame.draw.rect(screen, 'Grey25', led_1)
         pygame.draw.rect(screen, 'Grey25', led_2)
         pygame.draw.rect(screen, 'Grey25', led_3)
         pygame.draw.rect(screen, 'Grey25', led_4)
 
+        # Desenha os botões que correspondem aos... wait for it... botões
+        button_1 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
+        button_2 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
+        button_3 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
+        button_4 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
         pygame.draw.rect(screen, 'Green', button_1)
         pygame.draw.rect(screen, 'Yellow', button_2)
         pygame.draw.rect(screen, 'Red', button_3)
         pygame.draw.rect(screen, 'Blue', button_4)
 
-        if (button_1.collidepoint((mx, my))):
-            if (click or button1_state):
+
+        # Caso os botões sejam clicados, acendem o led correspondente
+        if (click and button_1.collidepoint((mx, my))) or button1_state:
                 pygame.draw.rect(screen, 'Green', led_1)
-
-        if (button_2.collidepoint((mx, my))):
-            if (click):
+        if (click and button_2.collidepoint((mx, my))) or button2_state:
                 pygame.draw.rect(screen, 'Yellow', led_2)
-
-        if (button_3.collidepoint((mx, my))):
-            if (click):
+        if (click and button_3.collidepoint((mx, my))) or button3_state:
                 pygame.draw.rect(screen, 'Red', led_3)
-
-        if (button_4.collidepoint((mx, my))):
-            if (click):
+        if (click and button_4.collidepoint((mx, my))) or button4_state:
                 pygame.draw.rect(screen, 'Blue', led_4)
 
         # if (click and changed):
@@ -338,10 +358,13 @@ def game():
         # click = False
         # release = False
         changed = False
+
+        # Analisa as entradas do teclado para esta tela
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
                 exit()
+            # verifica qual tecla foi pressionada
             if (event.type == KEYDOWN):
                 if (event.key == K_ESCAPE):
                     running = False
@@ -353,6 +376,7 @@ def game():
                     button3_state = True
                 if (event.key == K_j):
                     button4_state = True
+            # verifica qual tecla foi solta
             if (event.type == KEYUP):
                 if (event.key == K_f):
                     button1_state = False
@@ -362,6 +386,7 @@ def game():
                     button3_state = False
                 if (event.key == K_j):
                     button4_state = False
+            # verifica o mouse
             if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
                     changed = True
