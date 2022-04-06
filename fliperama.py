@@ -10,10 +10,10 @@ from sys import exit
 import paho.mqtt.client as mqtt
 import time
 
-global button1_state
-global button2_state
-global button3_state
-global button4_state
+# global button1_state
+# global button2_state
+# global button3_state
+# global button4_state
 
 user = "grupo2-bancadaA4"
 passwd = "L@Bdygy2A4"
@@ -22,6 +22,45 @@ Broker = "labdigi.wiseful.com.br"
 Port = 80                           
 KeepAlive = 60                      
 
+class ButtonState:
+    def __init__(self):
+        self.button1_state =False
+        self.button2_state =False
+        self.button3_state =False
+        self.button4_state =False
+        self.start = False
+        self.perdeu = False
+
+    def set(self, n, value):
+        if n == 1:
+            self.button1_state = value
+        elif n == 2:
+            self.button2_state = value
+        elif n == 3:
+            self.button3_state = value
+        elif n == 4:
+            self.button4_state = value
+        elif n == "start":
+            self.start = value
+        else:
+            self.perdeu = value
+
+    def get(self, n):
+        if n == 1:
+            return self.button1_state
+        elif n == 2:
+            return self.button2_state
+        elif n == 3:
+            return self.button3_state
+        elif n == 4:
+            return self.button4_state
+        elif n == "start":
+            return self.start
+        else:
+            return self.perdeu
+
+
+
 # Quando conectar na rede (Callback de conexao)
 def on_connect(client, userdata, flags, rc):
     print("Conectado com codigo " + str(rc))
@@ -29,6 +68,8 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(user+"/E5", qos=0)
     client.subscribe(user+"/E4", qos=0)
     client.subscribe(user+"/E3", qos=0)
+    client.subscribe(user+"/E2", qos=0)
+    client.subscribe(user+"/S4", qos=0)
 
 # Quando receber uma mensagem (Callback de mensagem)
 def on_message(client, userdata, msg):
@@ -39,17 +80,23 @@ def on_message(client, userdata, msg):
     else:
         is_pressed = False
     if str(msg.topic) == user+"/E6":
-        button1_state = is_pressed
+        button_state.set(1, is_pressed)
         print("Recebi uma mensagem de E6")
     elif str(msg.topic) == user+"/E5":
-        button2_state = is_pressed
+        button_state.set(2, is_pressed)
         print("Recebi uma mensagem de E5")
     elif str(msg.topic) == user+"/E4":
-        button3_state = is_pressed
+        button_state.set(3, is_pressed)
         print("Recebi uma mensagem de E4")
     elif str(msg.topic) == user+"/E3":
-        button4_state = is_pressed
+        button_state.set(4, is_pressed)
+        print("Recebi uma mensagem de E2")
+    elif str(msg.topic) == user+"/E2":
+        button_state.set("start", is_pressed)
         print("Recebi uma mensagem de E3")
+    elif str(msg.topic) == user+"/S4":
+        button_state.set("perdeu", is_pressed)
+        print("Recebi uma mensagem de S4")
     else:
         print("Erro! Mensagem recebida de tópico estranho")
 
@@ -97,6 +144,8 @@ client.publish(user+"/S0", payload="0", qos=0, retain=False)
 # Inicialização
 WIDTH = 900
 HEIGH = 600
+
+button_state = ButtonState()
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGH), 0, 32)
@@ -318,11 +367,11 @@ def select_difficulty():
 # Tela de criação de nickname (acessado via tela de jogo)
 def insert_name():
     # difficulty = 0
-    char_list = "AabCcdEFGHIJkLMnOoPqrStUuVWXyZ012345689 "
-    button1_state = False
-    button2_state = False
-    button3_state = False
-    button4_state = False
+    char_list = "AabCcdEFGHIJkLMnOoPqrStUuVWXyZ012345689"
+    button_state.set(1, False)
+    button_state.set(2, False)
+    button_state.set(3, False)
+    button_state.set(4, False)
     select = 0
     click = False
     changed = False
@@ -330,6 +379,8 @@ def insert_name():
     running = True
     # enquanto o jogador não aperta ESC ou return
     while running:
+        if (button_state.get("start") == 1):
+            running = False
         screen.fill((0, 0, 0))
         draw_text('Insert Name', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 100)
 
@@ -381,13 +432,13 @@ def insert_name():
 
 
         # Caso os botões sejam clicados, acendem o led correspondente
-        if ((click and button_1.collidepoint((mx, my))) or button1_state):
+        if ((click and button_1.collidepoint((mx, my))) or button_state.get(1)):
                 pygame.draw.rect(screen, 'Green', button_1)
-        if ((click and button_2.collidepoint((mx, my))) or button2_state):
+        if ((click and button_2.collidepoint((mx, my))) or button_state.get(2)):
                 pygame.draw.rect(screen, 'Yellow', button_2)
-        if ((click and button_3.collidepoint((mx, my))) or button3_state):
+        if ((click and button_3.collidepoint((mx, my))) or button_state.get(3)):
                 pygame.draw.rect(screen, 'Red', button_3)
-        if ((click and button_4.collidepoint((mx, my))) or button4_state):
+        if ((click and button_4.collidepoint((mx, my))) or button_state.get(4)):
                 pygame.draw.rect(screen, 'Blue', button_4)
 
         # if (click and changed):
@@ -396,33 +447,33 @@ def insert_name():
         #     print ("soltando")
 
         # vai para a esquerda
-        print("button_1", button1_state, " changed: ", changed)
-        if ((click and button_1.collidepoint((mx, my))) or (button1_state)):
+        print("button_1", button_state.get(1), " changed: ", changed)
+        if ((click and button_1.collidepoint((mx, my))) or (button_state.get(1))):
             if (select != 0):
                 select -= 1
         # incrementa o caractere
-        if ((click and button_2.collidepoint((mx, my))) or (button2_state)):
+        if ((click and button_2.collidepoint((mx, my))) or (button_state.get(2))):
             if (char_index[select] < len(char_list) - 1):
                 char_index[select] += 1
             else:
                 char_index[select] = 0
         # decrementa o caractere
-        if ((click and button_3.collidepoint((mx, my))) or (button3_state)):
+        if ((click and button_3.collidepoint((mx, my))) or (button_state.get(3))):
             if (char_index[select] > 0):
                 char_index[select] -= 1
             else:
                 char_index[select] = len(char_list) - 1
         # vai para a direita
-        if ((click and button_4.collidepoint((mx, my))) or (button4_state)):
+        if ((click and button_4.collidepoint((mx, my))) or (button_state.get(4))):
             if (select != 2):
                 select += 1
 
 
         click = False
-        button1_state = False
-        button2_state = False
-        button3_state = False
-        button4_state = False
+        button_state.set(1, False)
+        button_state.set(2, False)
+        button_state.set(3, False)
+        button_state.set(4, False)
         
 
         nickname = char_list[char_index[0]] + char_list[char_index[1]] + char_list[char_index[2]]
@@ -441,24 +492,24 @@ def insert_name():
                 if (event.key == K_RETURN):
                     running = False
                 if (event.key == K_a):
-                    button1_state = True
+                    button_state.set(1, True)
                 if (event.key == K_s):
-                    button2_state = True
+                    button_state.set(2, True)
                 if (event.key == K_d):
-                    button3_state = True
+                    button_state.set(3, True)
                 if (event.key == K_f):
-                    button4_state = True
+                    button_state.set(4, True)
             # verifica qual tecla foi solta
             if (event.type == KEYUP):
                 if (event.key == K_a):
-                    button1_state = False
+                    button_state.set(1, False)
                 if (event.key == K_s):
-                    button2_state = False
+                    button_state.set(2, False)
                 if (event.key == K_d):
                     changed = True
-                    button3_state = False
+                    button_state.set(3, False)
                 if (event.key == K_f):
-                    button4_state = False
+                    button_state.set(4, False)
             # verifica o mouse
             if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
@@ -503,12 +554,13 @@ def game():
     release = False
     running = True
     changed = False
-    button1_state = False
-    button2_state = False
-    button3_state = False
-    button4_state = False
+    button_state.set(1, False)
+    button_state.set(2, False)
+    button_state.set(3, False)
+    button_state.set(4, False)
     while running:
-
+        if (button_state.get("perdeu") == 1):
+            running = False
         screen.fill((0, 0, 0))
         draw_text('Difficulty '+ str(diff) +' selected', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 50)
 
@@ -541,13 +593,13 @@ def game():
 
 
         # Caso os botões sejam clicados, acendem o led correspondente
-        if ((click and button_1.collidepoint((mx, my))) or button1_state):
+        if ((click and button_1.collidepoint((mx, my))) or button_state.get(1)):
                 pygame.draw.rect(screen, 'Green', led_1)
-        if ((click and button_2.collidepoint((mx, my))) or button2_state):
+        if ((click and button_2.collidepoint((mx, my))) or button_state.get(2)):
                 pygame.draw.rect(screen, 'Yellow', led_2)
-        if ((click and button_3.collidepoint((mx, my))) or button3_state):
+        if ((click and button_3.collidepoint((mx, my))) or button_state.get(3)):
                 pygame.draw.rect(screen, 'Red', led_3)
-        if ((click and button_4.collidepoint((mx, my))) or button4_state):
+        if ((click and button_4.collidepoint((mx, my))) or button_state.get(4)):
                 pygame.draw.rect(screen, 'Blue', led_4)
 
         # if (click and changed):
@@ -569,23 +621,23 @@ def game():
                 if (event.key == K_ESCAPE):
                     running = False
                 if (event.key == K_a):
-                    button1_state = True
+                    button_state.set(1, True)
                 if (event.key == K_s):
-                    button2_state = True
+                    button_state.set(2, True)
                 if (event.key == K_d):
-                    button3_state = True
+                    button_state.set(3, True)
                 if (event.key == K_f):
-                    button4_state = True
+                    button_state.set(4, True)
             # verifica qual tecla foi solta
             if (event.type == KEYUP):
                 if (event.key == K_a):
-                    button1_state = False
+                    button_state.set(1, False)
                 if (event.key == K_s):
-                    button2_state = False
+                    button_state.set(2, False)
                 if (event.key == K_d):
-                    button3_state = False
+                    button_state.set(3, False)
                 if (event.key == K_f):
-                    button4_state = False
+                    button_state.set(4, False)
             # verifica o mouse
             if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
@@ -602,9 +654,10 @@ def game():
         pygame.display.update()
         clock.tick(60)
 
-    nick = insert_name()
-    leader_board = LeaderBoard()
-    leader_board.add(nick, 8888, diff)
+    if (button_state.get("start") == 1):
+        nick = insert_name()
+        leader_board = LeaderBoard()
+        leader_board.add(nick, 8888, diff)
 
 
 main_menu()
