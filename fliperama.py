@@ -138,12 +138,12 @@ def leaderboards():
         pygame.display.update()
         clock.tick(60)
 
-# global difficult
+# global difficulty
 # click = False
 
 # Tela de seleção de dificuldade (acessado via tela inicial)
-def select_difficult():
-    difficult = 0
+def select_difficulty():
+    difficulty = 0
     click = False
     running = True
     while running:
@@ -153,8 +153,8 @@ def select_difficult():
         mx, my = pygame.mouse.get_pos()
 
         # escreve a dificuldade selecionada (assim que alguma for selecionada)
-        if (difficult > 0):
-            draw_text('Difficulty '+ str(difficult), 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 200)
+        if (difficulty > 0):
+            draw_text('Difficulty '+ str(difficulty), 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 200)
 
         # desenha os botões correspondentes às dificuldades 
         dif_1 = pygame.Rect((WIDTH-200)*1/6, 300, 200, 100)
@@ -170,16 +170,16 @@ def select_difficult():
         # verifica qual dificuldade foi selecionada
         if (dif_1.collidepoint((mx, my))):
             if (click):
-                difficult = 1
-                return difficult
+                difficulty = 1
+                return difficulty
         if (dif_2.collidepoint((mx, my))):
             if (click):
-                difficult = 2
-                return difficult
+                difficulty = 2
+                return difficulty
         if (dif_3.collidepoint((mx, my))):
             if (click):
-                difficult = 3
-                return difficult
+                difficulty = 3
+                return difficulty
 
         click = False
 
@@ -202,11 +202,11 @@ def select_difficult():
         pygame.display.update()
         clock.tick(60)
 
-    return difficult
+    return difficulty
 
 # Tela de criação de nickname (acessado via tela de jogo)
 def insert_name():
-    # difficult = 0
+    # difficulty = 0
     char_list = "AabCcdEFGHIJkLMnOoPqrStUuVWXyZ012345689 "
     select = 0
     click = False
@@ -298,7 +298,7 @@ def insert_name():
 
 # Tela de jogo (acessado via tela de seleção de dificuldade)
 def game():
-    diff = select_difficult()
+    diff = select_difficulty()
     click = False
     release = False
     running = True
@@ -310,7 +310,7 @@ def game():
     while running:
 
         screen.fill((0, 0, 0))
-        draw_text('Difficult '+ str(diff) +' selected', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 50)
+        draw_text('Difficulty '+ str(diff) +' selected', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 50)
 
         mx, my = pygame.mouse.get_pos()
 
