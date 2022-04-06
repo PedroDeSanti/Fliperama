@@ -13,7 +13,7 @@ HEIGH = 600
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGH), 0, 32)
-pygame.display.set_caption('Fliperama Perfeito Gamer Amador')
+pygame.display.set_caption('FPGA: O Melhor Jogo Já Criado!')
 clock = pygame.time.Clock()
 
 # test_surface = pygame.Surface((200, 100))
@@ -29,6 +29,9 @@ title_surface = title.render('Fliperama', False, 'Green')
 # y = 0
 click = False
 
+programIcon = pygame.image.load("assets/arakraken.png")
+pygame.display.set_icon(programIcon)
+
 def draw_text (text, font, size, color, surface, x, y):
     text_font = pygame.font.Font(font, size)
     text_surface = text_font.render(text, False, color)
@@ -36,17 +39,29 @@ def draw_text (text, font, size, color, surface, x, y):
     text_rect.center = (x, y)
     surface.blit(text_surface, text_rect)
 
+def display_img(img, x, y):
+    screen.blit(img, (x,y))
+
 # Tela inicial
 def main_menu():    
     while True:
         screen.fill((0, 0, 0))
-        draw_text('Fliperama', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 100)
+        draw_text('F        ', 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2, 75)
+        draw_text('P        ', 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2, 125)
+        draw_text('G        ', 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2, 175)
+        draw_text('A        ', 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2, 225)
+        draw_text(' liperama', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 75)
+        draw_text(' erfeito ', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 125)
+        draw_text(' amer    ', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 175)
+        draw_text(' mador   ', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 225)
 
         mx, my = pygame.mouse.get_pos()
 
 
-        button_1 = pygame.Rect((WIDTH-200)/2, 200, 200, 50)
-        button_2 = pygame.Rect((WIDTH-200)/2, 300, 200, 50)
+        button_1 = pygame.Rect((WIDTH-200)/2-25, 300, 250, 80)
+        # botaoIniciar = pygame.image.load("assets/botao.png")
+        # display_img(botaoIniciar, 100, 200)
+        button_2 = pygame.Rect((WIDTH-200)/2-25, 400, 250, 80)
 
         # se o jogador clica nos botões, vai para as tela correspondente (jogo ou ranking)
         if (button_1.collidepoint((mx, my))):
@@ -58,9 +73,11 @@ def main_menu():
                 leaderboards()
 
         # Desenha os dois botões para jogo e ranking
-        pygame.draw.rect(screen, 'Red', button_1)
-        pygame.draw.rect(screen, 'Red', button_2)
-
+        pygame.draw.rect(screen, 'Silver', button_1)
+        pygame.draw.rect(screen, 'Gold', button_2)
+        draw_text("Start Game", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)/2+100, 340)
+        draw_text("Leaderboard", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)/2+100, 440)
+        
         click = False
         
         # Analisa os comandos do teclado para a tela MainMenu
@@ -113,7 +130,7 @@ def leaderboards():
             else:
                 position = str(i) + "TH"
             draw_text(position, 'assets/PressStart2P.ttf', 20, 'Green', screen, x, y)
-            y = y + 50
+            y = y + 52
 
         # Escreve o nome e pontuação de cada jogador
         y = 150
@@ -124,7 +141,7 @@ def leaderboards():
                 draw_text(str(item), 'assets/PressStart2P.ttf', 20, 'Green', screen, x, y)
 
                 x = x + 100
-            y = y + 50
+            y = y + 52
                 
         # Analisa as entradas do teclado para esta tela
         for event in pygame.event.get():
@@ -157,15 +174,22 @@ def select_difficulty():
             draw_text('Difficulty '+ str(difficulty), 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 200)
 
         # desenha os botões correspondentes às dificuldades 
-        dif_1 = pygame.Rect((WIDTH-200)*1/6, 300, 200, 100)
-        dif_2 = pygame.Rect((WIDTH-200)*3/6, 300, 200, 100)
-        dif_3 = pygame.Rect((WIDTH-200)*5/6, 300, 200, 100)
+        dif_1 = pygame.Rect((WIDTH-200)*1/6, 400, 200, 100)
+        dif_2 = pygame.Rect((WIDTH-200)*3/6, 400, 200, 100)
+        dif_3 = pygame.Rect((WIDTH-200)*5/6, 400, 200, 100)
         pygame.draw.rect(screen, 'Green', dif_1)
         pygame.draw.rect(screen, 'Yellow', dif_2)
         pygame.draw.rect(screen, 'Red', dif_3)
-        draw_text("Gugu Dadá", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*1/6+100, 350)
-        draw_text("Normal", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*3/6+100, 350)
-        draw_text("Doom", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*5/6+100, 350)
+        draw_text("Gugu Dadá", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*1/6+100, 450)
+        draw_text("Normal", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*3/6+100, 450)
+        draw_text("Doom", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*5/6+100, 450)
+
+        guguDada = pygame.image.load("assets/pacifier.png")
+        display_img(guguDada, (WIDTH-200)*1/6, 200)
+        pikachu = pygame.image.load("assets/pikachu.png")
+        display_img(pikachu, (WIDTH-200)*3/6+25, 190)
+        doomGuy = pygame.image.load("assets/doomGuy3.png")
+        display_img(doomGuy, (WIDTH-200)*5/6+25, 190)
 
         # verifica qual dificuldade foi selecionada
         if (dif_1.collidepoint((mx, my))):
@@ -231,17 +255,17 @@ def insert_name():
 
         # Define a cor dos caracteres mostrados a depender de qual está atualmente selecionado
         if (select == 0):
-            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2, 200)
-            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 50, 200)
-            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 100, 200)    
+            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 -50, 200)
+            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 , 200)
+            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 50, 200)    
         elif (select == 1):
-            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 200)
-            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 + 50, 200)
-            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 100, 200)
+            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 - 50, 200)
+            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 , 200)
+            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 50, 200)
         else:
-            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 200)
-            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 + 50, 200)
-            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 + 100, 200)
+            draw_text(char_list[char_index[0]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 - 50, 200)
+            draw_text(char_list[char_index[1]], 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2 , 200)
+            draw_text(char_list[char_index[2]], 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2 + 50, 200)
 
         # vai para a esquerda
         if (button_1.collidepoint((mx, my))):
