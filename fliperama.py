@@ -2,7 +2,7 @@ from leaderboard import *
 import pygame
 from pygame.locals import *
 from sys import exit
-
+# O PEDRO É MUITO LEGAL. SÓ O PEDRO.
 WIDTH = 900
 HEIGH = 600
 
