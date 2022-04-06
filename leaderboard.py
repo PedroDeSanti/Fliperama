@@ -10,7 +10,7 @@ class LeaderBoard:
     def get(self, difficult):
         player = []
         score_list = []
-
+        
         # Seleciona do BD os valores da dificuldade correspondente, e os coloca em ordem decrescente
         lista = list(self.scores.find({"difficult": difficult}).sort("score", DESCENDING))
         # For testing
@@ -36,9 +36,13 @@ class LeaderBoard:
         # insere o id, nick, score e dificuldade do jogador no BD do ranking
         self.scores.insert_one({"_id": id_number, "nick": nick, "score": score, "difficult": difficult})
 
+    def clear_all_scores(self):
+        self.scores.delete_many({})
+
 # For testing:
 
 # leader_board = LeaderBoard()
+# leader_board.clear_all_scores()
 # lista = leader_board.get(1)
 # lista = leader_board.get(2)
 # lista = leader_board.get(3)
