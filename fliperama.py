@@ -3,6 +3,7 @@ import pygame
 from pygame.locals import *
 from sys import exit
 # O PEDRO É MUITO LEGAL. SÓ O PEDRO.
+# O JOÃO É UM CARA MUITO.... MUITOO.... MUITO?
 WIDTH = 900
 HEIGH = 600
 
