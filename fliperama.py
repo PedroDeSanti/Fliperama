@@ -28,8 +28,8 @@ class ButtonState:
         self.button2_state =False
         self.button3_state =False
         self.button4_state =False
-        self.start = False
-        self.perdeu = False
+        self.iniciar = False
+        self.pronto = False
 
     def set(self, n, value):
         if n == 1:
@@ -40,10 +40,10 @@ class ButtonState:
             self.button3_state = value
         elif n == 4:
             self.button4_state = value
-        elif n == "start":
-            self.start = value
+        elif n == "iniciar":
+            self.iniciar = value
         else:
-            self.perdeu = value
+            self.pronto = value
 
     def get(self, n):
         if n == 1:
@@ -54,10 +54,10 @@ class ButtonState:
             return self.button3_state
         elif n == 4:
             return self.button4_state
-        elif n == "start":
-            return self.start
+        elif n == "iniciar":
+            return self.iniciar
         else:
-            return self.perdeu
+            return self.pronto
 
 
 
@@ -92,10 +92,10 @@ def on_message(client, userdata, msg):
         button_state.set(4, is_pressed)
         print("Recebi uma mensagem de E2")
     elif str(msg.topic) == user+"/E2":
-        button_state.set("start", is_pressed)
+        button_state.set("iniciar", is_pressed)
         print("Recebi uma mensagem de E3")
     elif str(msg.topic) == user+"/S4":
-        button_state.set("perdeu", is_pressed)
+        button_state.set("pronto", is_pressed)
         print("Recebi uma mensagem de S4")
     else:
         print("Erro! Mensagem recebida de tópico estranho")
@@ -372,6 +372,8 @@ def insert_name():
     button_state.set(2, False)
     button_state.set(3, False)
     button_state.set(4, False)
+    button_state.set("iniciar", False)
+    button_state.set("pronto", False)
     select = 0
     click = False
     changed = False
@@ -379,7 +381,7 @@ def insert_name():
     running = True
     # enquanto o jogador não aperta ESC ou return
     while running:
-        if (button_state.get("start") == 1):
+        if (button_state.get("iniciar") == 1):
             running = False
         screen.fill((0, 0, 0))
         draw_text('Insert Name', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 100)
@@ -474,6 +476,8 @@ def insert_name():
         button_state.set(2, False)
         button_state.set(3, False)
         button_state.set(4, False)
+        button_state.set("iniciar", False)
+        button_state.set("pronto", False)
         
 
         nickname = char_list[char_index[0]] + char_list[char_index[1]] + char_list[char_index[2]]
@@ -543,7 +547,7 @@ def insert_name():
         #             click = False
 
         pygame.display.update()
-        clock.tick(10)
+        clock.tick(60)
 
     return nickname
 
@@ -558,8 +562,10 @@ def game():
     button_state.set(2, False)
     button_state.set(3, False)
     button_state.set(4, False)
+    button_state.set("iniciar", False)
+    button_state.set("pronto", False)
     while running:
-        if (button_state.get("perdeu") == 1):
+        if (button_state.get("pronto") == 1):
             running = False
         screen.fill((0, 0, 0))
         draw_text('Difficulty '+ str(diff) +' selected', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 50)
@@ -653,8 +659,10 @@ def game():
 
         pygame.display.update()
         clock.tick(60)
-
-    if (button_state.get("start") == 1):
+    # isso aqui ta errado -> ta rodandosó uma vez
+    button_state.set("perdeu", False)
+    if (button_state.get("iniciar") == 1):
+        button_state.set("iniciar", False)
         nick = insert_name()
         leader_board = LeaderBoard()
         leader_board.add(nick, 8888, diff)
