@@ -1,25 +1,3 @@
-
-# import pygame
-# import sys
-
-# mainClock = pygame.time.Clock()
-# from pygame.locals import *
-# pygame.init()
-# pygame.display.set_caption('Fliperama Perfeito Gamer Amador')
-# screen = pygame.display.set_mode((500, 500), 0, 32)
-
-# font = pygame.font.SysFont(None, 20)
-
-# while True:
-#     screen.fill((0, 0, 0))
-
-#     pygame.display.update()
-#     mainClock.tick(60)
-
-# from tkinter.tix import Tree
-# from matplotlib.pyplot import text
-# from black import diff
-from turtle import position
 from leaderboard import *
 import pygame
 from pygame.locals import *
@@ -254,11 +232,10 @@ def insert_name():
 
         if (button_3.collidepoint((mx, my))):
             if (click):
-                if (click):
-                    if (char_index[select] > 0):
-                        char_index[select] -= 1
-                    else:
-                        char_index[select] = len(char_list) - 1
+                if (char_index[select] > 0):
+                    char_index[select] -= 1
+                else:
+                    char_index[select] = len(char_list) - 1
 
         if (button_4.collidepoint((mx, my))):
             if (click):
@@ -299,13 +276,23 @@ def insert_name():
 def game():
     diff = select_difficult()
     click = False
+    release = False
     running = True
+    changed = False
+    button1_state = False
+    button2_state = False
+    button3_state = False
+    button4_state = False
     while running:
 
         screen.fill((0, 0, 0))
         draw_text('Difficult '+ str(diff) +' selected', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 50)
 
         mx, my = pygame.mouse.get_pos()
+
+        # test_surface = pygame.image.load('assets/botao.png').convert_alpha()
+        # test_rect = test_surface.get_rect()
+        # screen.blit(test_surface, (x, y))
 
         led_1 = pygame.Rect((WIDTH-150)*1/8, 200, 150, 100)
         led_2 = pygame.Rect((WIDTH-150)*3/8, 200, 150, 100)
@@ -317,22 +304,6 @@ def game():
         button_3 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
         button_4 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
 
-        if (button_1.collidepoint((mx, my))):
-            if (click):
-                running = False
-
-        if (button_2.collidepoint((mx, my))):
-            if (click):
-                pass
-
-        if (button_3.collidepoint((mx, my))):
-            if (click):
-                pass
-
-        if (button_4.collidepoint((mx, my))):
-            if (click):
-                pass
-
         pygame.draw.rect(screen, 'Grey25', led_1)
         pygame.draw.rect(screen, 'Grey25', led_2)
         pygame.draw.rect(screen, 'Grey25', led_3)
@@ -343,7 +314,30 @@ def game():
         pygame.draw.rect(screen, 'Red', button_3)
         pygame.draw.rect(screen, 'Blue', button_4)
 
+        if (button_1.collidepoint((mx, my))):
+            if (click or button1_state):
+                pygame.draw.rect(screen, 'Green', led_1)
 
+        if (button_2.collidepoint((mx, my))):
+            if (click):
+                pygame.draw.rect(screen, 'Yellow', led_2)
+
+        if (button_3.collidepoint((mx, my))):
+            if (click):
+                pygame.draw.rect(screen, 'Red', led_3)
+
+        if (button_4.collidepoint((mx, my))):
+            if (click):
+                pygame.draw.rect(screen, 'Blue', led_4)
+
+        # if (click and changed):
+        #     print ("clicando")
+        # if (release and changed):
+        #     print ("soltando")
+
+        # click = False
+        # release = False
+        changed = False
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
@@ -351,20 +345,41 @@ def game():
             if (event.type == KEYDOWN):
                 if (event.key == K_ESCAPE):
                     running = False
+                if (event.key == K_f):
+                    button1_state = True
+                if (event.key == K_g):
+                    button2_state = True
+                if (event.key == K_h):
+                    button3_state = True
+                if (event.key == K_j):
+                    button4_state = True
+            if (event.type == KEYUP):
+                if (event.key == K_f):
+                    button1_state = False
+                if (event.key == K_g):
+                    button2_state = False
+                if (event.key == K_h):
+                    button3_state = False
+                if (event.key == K_j):
+                    button4_state = False
             if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
+                    changed = True
                     click = True
+                    release = False
                     clicking = [mx, my]
             if (event.type == MOUSEBUTTONUP):
                 if (event.button == 1):
+                    changed = True
                     click = False
+                    release = True
 
         pygame.display.update()
         clock.tick(60)
 
     nick = insert_name()
     leader_board = LeaderBoard()
-    leader_board.add(nick, 999, diff)
+    leader_board.add(nick, 8888, diff)
 
 
 main_menu()
