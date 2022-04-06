@@ -341,13 +341,13 @@ def game():
 
 
         # Caso os botões sejam clicados, acendem o led correspondente
-        if (click and button_1.collidepoint((mx, my))) or button1_state:
+        if ((click and button_1.collidepoint((mx, my))) or button1_state):
                 pygame.draw.rect(screen, 'Green', led_1)
-        if (click and button_2.collidepoint((mx, my))) or button2_state:
+        if ((click and button_2.collidepoint((mx, my))) or button2_state):
                 pygame.draw.rect(screen, 'Yellow', led_2)
-        if (click and button_3.collidepoint((mx, my))) or button3_state:
+        if ((click and button_3.collidepoint((mx, my))) or button3_state):
                 pygame.draw.rect(screen, 'Red', led_3)
-        if (click and button_4.collidepoint((mx, my))) or button4_state:
+        if ((click and button_4.collidepoint((mx, my))) or button4_state):
                 pygame.draw.rect(screen, 'Blue', led_4)
 
         # if (click and changed):
@@ -368,23 +368,23 @@ def game():
             if (event.type == KEYDOWN):
                 if (event.key == K_ESCAPE):
                     running = False
-                if (event.key == K_f):
+                if (event.key == K_a):
                     button1_state = True
-                if (event.key == K_g):
+                if (event.key == K_s):
                     button2_state = True
-                if (event.key == K_h):
+                if (event.key == K_d):
                     button3_state = True
-                if (event.key == K_j):
+                if (event.key == K_f):
                     button4_state = True
             # verifica qual tecla foi solta
             if (event.type == KEYUP):
-                if (event.key == K_f):
+                if (event.key == K_a):
                     button1_state = False
-                if (event.key == K_g):
+                if (event.key == K_s):
                     button2_state = False
-                if (event.key == K_h):
+                if (event.key == K_d):
                     button3_state = False
-                if (event.key == K_j):
+                if (event.key == K_f):
                     button4_state = False
             # verifica o mouse
             if (event.type == MOUSEBUTTONDOWN):
