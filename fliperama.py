@@ -31,6 +31,7 @@ class ButtonState:
         self.button4_state =False
         self.iniciar = False
         self.pronto = False
+        self.tx = False
 
     def set(self, n, value):
         if n == 1:
@@ -43,8 +44,10 @@ class ButtonState:
             self.button4_state = value
         elif n == "iniciar":
             self.iniciar = value
-        else:
+        elif n == "pronto":
             self.pronto = value
+        else:
+            self.tx = value
 
     def get(self, n):
         if n == 1:
@@ -57,16 +60,19 @@ class ButtonState:
             return self.button4_state
         elif n == "iniciar":
             return self.iniciar
-        else:
+        elif n == "pronto":
             return self.pronto
+        else:
+            return self.tx
 
     def reset(self):
-        self.button1_state =False
-        self.button2_state =False
-        self.button3_state =False
-        self.button4_state =False
+        self.button1_state = False
+        self.button2_state = False
+        self.button3_state = False
+        self.button4_state = False
         self.iniciar = False
         self.pronto = False
+        self.tx = False
 
 leader_board = LeaderBoard()
 
@@ -112,6 +118,7 @@ def on_message(client, userdata, msg):
         print("Recebi uma mensagem de TX")
         print(str(msg.payload.decode("utf-8")))
         leader_board.construct_message(str(msg.payload.decode("utf-8")))
+        button_state.set("tx", True)
     else:
         print("Erro! Mensagem recebida de tópico estranho")
 
@@ -710,10 +717,16 @@ def game():
         clock.tick(60)
     
     count = 0
-    while (count < 60*10):
+    while (count <= 6):
         screen.fill((0, 0, 0))
         draw_text('Esperando tx...', 'assets/PressStart2P.ttf', 60, 'Green', screen, WIDTH/2, HEIGH/2)
-        count += 1
+        if (button_state.get("tx")):
+            count += 1
+            button_state.reset()
+        for event in pygame.event.get():
+            if (event.type == QUIT):
+                pygame.quit()
+                exit()
         pygame.display.update()
         clock.tick(60)
     
