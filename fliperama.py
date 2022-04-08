@@ -84,10 +84,11 @@ def on_connect(client, userdata, flags, rc):
 def on_message(client, userdata, msg):
     print(str(msg.topic)+" "+str(msg.payload.decode("utf-8")))
 
-    if(int(str(msg.payload.decode("utf-8"))) == 1):
-        is_pressed = True
-    else:
-        is_pressed = False
+    if (str(msg.topic) != user+"/TX"):
+        if(int(str(msg.payload.decode("utf-8"))) == 1):
+            is_pressed = True
+        else:
+            is_pressed = False
     if str(msg.topic) == user+"/E6":
         button_state.set(1, is_pressed)
         print("Recebi uma mensagem de E6")
@@ -106,8 +107,9 @@ def on_message(client, userdata, msg):
     elif str(msg.topic) == user+"/S4":
         button_state.set("pronto", is_pressed)
         print("Recebi uma mensagem de S4")
-    elif str(msg.topic) == user+"TX":
+    elif str(msg.topic) == user+"/TX":
         print("Recebi uma mensagem de TX")
+        print(str(msg.payload.decode("utf-8")))
     else:
         print("Erro! Mensagem recebida de tópico estranho")
 
@@ -375,7 +377,7 @@ def select_difficulty():
 # Tela de criação de nickname (acessado via tela de jogo)
 def insert_name():
     # difficulty = 0
-    char_list = "AabCcdEFGHIJkLMnOoPqrStUuVWXyZ012345689"
+    char_list = "AabCcdEFGHIJkLMnOoPqrStUuVWXyZ0123456789"
     button_state.set(1, False)
     button_state.set(2, False)
     button_state.set(3, False)
@@ -670,6 +672,7 @@ def game():
     
     button_state.reset()
     running = True
+    iniciar = False
     while running:
     # isso aqui ta errado -> ta rodandosó uma vez
         screen.fill((0, 0, 0))
@@ -702,6 +705,15 @@ def game():
         
         pygame.display.update()
         clock.tick(60)
+    
+    count = 0
+    while (count < 60*10):
+        screen.fill((0, 0, 0))
+        draw_text('Esperando tx...', 'assets/PressStart2P.ttf', 60, 'Green', screen, WIDTH/2, HEIGH/2)
+        count += 1
+        pygame.display.update()
+        clock.tick(60)
+
     client.publish(user+"/E1", payload="1", qos=0, retain=False)
     time.sleep(0.2)
     client.publish(user+"/E1", payload="0", qos=0, retain=False)
