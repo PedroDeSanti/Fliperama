@@ -1,3 +1,4 @@
+from tkinter import W
 from leaderboard import *
 import pygame
 from pygame.locals import *
@@ -18,9 +19,9 @@ import time
 user = "grupo2-bancadaA4"
 passwd = "L@Bdygy2A4"
 
-Broker = "labdigi.wiseful.com.br"           
-Port = 80                           
-KeepAlive = 60                      
+Broker = "labdigi.wiseful.com.br"
+Port = 80
+KeepAlive = 60
 
 class ButtonState:
     def __init__(self):
@@ -59,6 +60,13 @@ class ButtonState:
         else:
             return self.pronto
 
+    def reset(self):
+        self.button1_state =False
+        self.button2_state =False
+        self.button3_state =False
+        self.button4_state =False
+        self.iniciar = False
+        self.pronto = False
 
 
 # Quando conectar na rede (Callback de conexao)
@@ -70,6 +78,7 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(user+"/E3", qos=0)
     client.subscribe(user+"/E2", qos=0)
     client.subscribe(user+"/S4", qos=0)
+    client.subscribe(user+"/TX", qos=0)
 
 # Quando receber uma mensagem (Callback de mensagem)
 def on_message(client, userdata, msg):
@@ -97,6 +106,8 @@ def on_message(client, userdata, msg):
     elif str(msg.topic) == user+"/S4":
         button_state.set("pronto", is_pressed)
         print("Recebi uma mensagem de S4")
+    elif str(msg.topic) == user+"TX":
+        print("Recebi uma mensagem de TX")
     else:
         print("Erro! Mensagem recebida de tópico estranho")
 
@@ -105,8 +116,6 @@ client.on_connect = on_connect
 client.on_message = on_message  
 
 client.username_pw_set(user, passwd)
-
-
 
 
 print("=================================================")
@@ -125,16 +134,6 @@ client.publish(user+"/S0", payload="0", qos=0, retain=False)
 #     time.sleep(2)
 #     client.publish(user+"/S0", payload="0", qos=0, retain=False)
 #     time.sleep(2)
-
-
-
-
-
-
-
-
-
-
 
 #######################################################
 
@@ -179,7 +178,9 @@ def display_img(img, x, y):
     screen.blit(img, (x,y))
 
 # Tela inicial
-def main_menu():    
+def main_menu():
+    click = False
+    start = False   
     while True:
         screen.fill((0, 0, 0))
         draw_text('F        ', 'assets/PressStart2P.ttf', 50, 'Red', screen, WIDTH/2, 75)
@@ -199,28 +200,31 @@ def main_menu():
         # display_img(botaoIniciar, 100, 200)
         button_2 = pygame.Rect((WIDTH-200)/2-25, 400, 250, 80)
 
-        # se o jogador clica nos botões, vai para as tela correspondente (jogo ou ranking)
-        if (button_1.collidepoint((mx, my))):
-            if (click):
-                # leaderboards()
-                game()
-        if (button_2.collidepoint((mx, my))):
-            if (click):
-                leaderboards()
-
         # Desenha os dois botões para jogo e ranking
         pygame.draw.rect(screen, 'Silver', button_1)
         pygame.draw.rect(screen, 'Gold', button_2)
         draw_text("Start Game", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)/2+100, 340)
         draw_text("Leaderboard", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)/2+100, 440)
         
+        # se o jogador clica nos botões, vai para as tela correspondente (jogo ou ranking)
+        if ((click and button_1.collidepoint((mx, my))) or button_state.get("iniciar") == 1 or start == 1):
+            # leaderboards()
+            game()
+        if (button_2.collidepoint((mx, my))):
+            if (click):
+                leaderboards()
+        
         click = False
+        start = False
         
         # Analisa os comandos do teclado para a tela MainMenu
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
                 exit()
+            if (event.type == KEYDOWN):
+                if (event.key == K_RETURN):
+                    start = True
             if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
                     click = True
@@ -229,7 +233,6 @@ def main_menu():
                 if (event.button == 1):
                     click = False
 
-        
         # screen.blit(test_surface, ((WIDTH-test_surface.get_width())/2, 300))
         # screen.blit(title_surface, ((WIDTH-title_surface.get_width())/2, 100))
         # screen.blit(test_surface, (x, y))
@@ -449,7 +452,7 @@ def insert_name():
         #     print ("soltando")
 
         # vai para a esquerda
-        print("button_1", button_state.get(1), " changed: ", changed)
+        # print("button_1", button_state.get(1), " changed: ", changed)
         if ((click and button_1.collidepoint((mx, my))) or (button_state.get(1))):
             if (select != 0):
                 select -= 1
@@ -659,13 +662,35 @@ def game():
 
         pygame.display.update()
         clock.tick(60)
+    
+    button_state.reset()
+    running = True
+    while running:
     # isso aqui ta errado -> ta rodandosó uma vez
-    button_state.set("perdeu", False)
-    if (button_state.get("iniciar") == 1):
-        button_state.set("iniciar", False)
-        nick = insert_name()
-        leader_board = LeaderBoard()
-        leader_board.add(nick, 8888, diff)
+        screen.fill((0, 0, 0))
+        draw_text('Perdeu jovem', 'assets/PressStart2P.ttf', 60, 'Green', screen, WIDTH/2, HEIGH/2)
+        draw_text('Press start (or enter)', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, HEIGH/2+60)
+        draw_text('to register your name', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, HEIGH/2+80)
 
+        if (button_state.get("iniciar") == 1):
+            nick = insert_name()
+            leader_board = LeaderBoard()
+            leader_board.add(nick, 8888, diff)
+            running = False
+
+        for event in pygame.event.get():
+            if (event.type == QUIT):
+                pygame.quit()
+                exit()
+            # if (event.type == MOUSEBUTTONDOWN):
+            #     if (event.button == 1):
+            #         click = True
+            #         clicking = [mx, my]
+            # if (event.type == MOUSEBUTTONUP):
+            #     if (event.button == 1):
+            #         click = False
+        
+        pygame.display.update()
+        clock.tick(60)
 
 main_menu()
