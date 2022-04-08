@@ -23,6 +23,39 @@ Broker = "labdigi.wiseful.com.br"
 Port = 80
 KeepAlive = 60
 
+class LedState:
+    def __init__(self):
+        self.led1_state =False
+        self.led2_state =False
+        self.led3_state =False
+        self.led4_state =False
+
+    def set(self, n, value):
+        if n == 1:
+            self.led1_state = value
+        elif n == 2:
+            self.led2_state = value
+        elif n == 3:
+            self.led3_state = value
+        else:
+            self.led4_state = value
+
+    def get(self, n):
+        if n == 1:
+            return self.led1_state
+        elif n == 2:
+            return self.led2_state
+        elif n == 3:
+            return self.led3_state
+        else:
+            return self.led4_state
+
+    def reset(self):
+        self.led1_state = False
+        self.led2_state = False
+        self.led3_state = False
+        self.led4_state = False
+
 class ButtonState:
     def __init__(self):
         self.button1_state =False
@@ -97,28 +130,51 @@ def on_message(client, userdata, msg):
         else:
             is_pressed = False
     if str(msg.topic) == user+"/E6":
-        button_state.set(1, is_pressed)
-        print("Recebi uma mensagem de E6")
-    elif str(msg.topic) == user+"/E5":
-        button_state.set(2, is_pressed)
-        print("Recebi uma mensagem de E5")
-    elif str(msg.topic) == user+"/E4":
-        button_state.set(3, is_pressed)
-        print("Recebi uma mensagem de E4")
-    elif str(msg.topic) == user+"/E3":
         button_state.set(4, is_pressed)
+        print("Recebi uma mensagem de E6")
+
+    elif str(msg.topic) == user+"/E5":
+        button_state.set(3, is_pressed)
+        print("Recebi uma mensagem de E5")
+
+    elif str(msg.topic) == user+"/E4":
+        button_state.set(2, is_pressed)
+        print("Recebi uma mensagem de E4")
+
+    elif str(msg.topic) == user+"/E3":
+        button_state.set(1, is_pressed)
         print("Recebi uma mensagem de E3")
+
     elif str(msg.topic) == user+"/E2":
         button_state.set("iniciar", is_pressed)
         print("Recebi uma mensagem de E2")
+
+    elif str(msg.topic) == user+"/S3":
+        button_state.set(3, is_pressed)
+        print("Recebi uma mensagem de S3")
+
+    elif str(msg.topic) == user+"/S2":
+        button_state.set(2, is_pressed)
+        print("Recebi uma mensagem de S2")
+
+    elif str(msg.topic) == user+"/S1":
+        button_state.set(1, is_pressed)
+        print("Recebi uma mensagem de S1")
+
+    elif str(msg.topic) == user+"/S0":
+        button_state.set("iniciar", is_pressed)
+        print("Recebi uma mensagem de S0")
+
     elif str(msg.topic) == user+"/S4":
         button_state.set("pronto", is_pressed)
         print("Recebi uma mensagem de S4")
+
     elif str(msg.topic) == user+"/TX":
         print("Recebi uma mensagem de TX")
         print(str(msg.payload.decode("utf-8")))
         leader_board.construct_message(str(msg.payload.decode("utf-8")))
         button_state.set("tx", True)
+
     else:
         print("Erro! Mensagem recebida de tópico estranho")
 
@@ -149,13 +205,12 @@ client.publish(user+"/S0", payload="0", qos=0, retain=False)
 #######################################################
 
 
-
-
 # Inicialização
 WIDTH = 900
 HEIGH = 600
 
 button_state = ButtonState()
+led_state = LedState()
 
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGH), 0, 32)
@@ -192,7 +247,7 @@ def display_img(img, x, y):
 def main_menu():
     # Reseta o circuito 
     client.publish(user+"/E1", payload="1", qos=0, retain=False)
-    time.sleep(0.2)
+    time.sleep(0.3)
     client.publish(user+"/E1", payload="0", qos=0, retain=False)
 
     click = False
@@ -223,8 +278,10 @@ def main_menu():
         draw_text("Leaderboard", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)/2+100, 440)
         
         # se o jogador clica nos botões, vai para as tela correspondente (jogo ou ranking)
-        if ((click and button_1.collidepoint((mx, my))) or button_state.get("iniciar") == 1 or start == 1):
+        if ((click and button_1.collidepoint((mx, my))) or button_state.get("iniciar") or start):
             # leaderboards()
+            if (not (button_state.get("iniciar"))):
+                client.publish(user+"/E2", payload="1", qos=0, retain=False)
             game()
         if (button_2.collidepoint((mx, my))):
             if (click):
@@ -346,29 +403,46 @@ def select_difficulty():
         display_img(doomGuy, (WIDTH-200)*1/6+25, 190)
 
         # verifica qual dificuldade foi selecionada
-        if (dif_1.collidepoint((mx, my))):
-            if (click):
-                difficulty = 1
-                return difficulty
-        if (dif_2.collidepoint((mx, my))):
-            if (click):
-                difficulty = 2
-                return difficulty
-        if (dif_3.collidepoint((mx, my))):
-            if (click):
-                difficulty = 3
-                return difficulty
+        if ((click and dif_1.collidepoint((mx, my))) or button_state.get(1)):
+            difficulty = 1
+            return difficulty
+        if ((click and dif_2.collidepoint((mx, my))) or button_state.get(2)):
+            difficulty = 2
+            return difficulty
+        if ((click and dif_3.collidepoint((mx, my))) or button_state.get(3)):
+            difficulty = 3
+            return difficulty
 
         click = False
+        button_state.reset()
 
         # Analisa as entradas do teclado para esta tela
         for event in pygame.event.get():
             if (event.type == QUIT):
                 pygame.quit()
                 exit()
+            # verifica qual tecla foi pressionada
             if (event.type == KEYDOWN):
                 if (event.key == K_ESCAPE):
                     running = False
+                if (event.key == K_a):
+                    button_state.set(4, True)
+                if (event.key == K_s):
+                    button_state.set(3, True)
+                if (event.key == K_d):
+                    button_state.set(2, True)
+                if (event.key == K_f):
+                    button_state.set(1, True)
+            # verifica qual tecla foi solta
+            if (event.type == KEYUP):
+                if (event.key == K_a):
+                    button_state.set(4, False)
+                if (event.key == K_s):
+                    button_state.set(3, False)
+                if (event.key == K_d):
+                    button_state.set(2, False)
+                if (event.key == K_f):
+                    button_state.set(1, False)
             if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
                     click = True
@@ -574,6 +648,9 @@ def insert_name():
 
 # Tela de jogo (acessado via tela de seleção de dificuldade)
 def game():
+    time.sleep(0.3)
+    client.publish(user+"/E2", payload="0", qos=0, retain=False)
+
     diff = select_difficulty()
     click = False
     release = False
@@ -599,36 +676,39 @@ def game():
 
 
         # Desenha os quadrados correspondentes aos leds
-        led_1 = pygame.Rect((WIDTH-150)*1/8, 200, 150, 100)
-        led_2 = pygame.Rect((WIDTH-150)*3/8, 200, 150, 100)
-        led_3 = pygame.Rect((WIDTH-150)*5/8, 200, 150, 100)
-        led_4 = pygame.Rect((WIDTH-150)*7/8, 200, 150, 100)
-        pygame.draw.rect(screen, 'Grey25', led_1)
-        pygame.draw.rect(screen, 'Grey25', led_2)
-        pygame.draw.rect(screen, 'Grey25', led_3)
+        led_4 = pygame.Rect((WIDTH-150)*1/8, 200, 150, 100)
+        led_3 = pygame.Rect((WIDTH-150)*3/8, 200, 150, 100)
+        led_2 = pygame.Rect((WIDTH-150)*5/8, 200, 150, 100)
+        led_1 = pygame.Rect((WIDTH-150)*7/8, 200, 150, 100)
         pygame.draw.rect(screen, 'Grey25', led_4)
+        pygame.draw.rect(screen, 'Grey25', led_3)
+        pygame.draw.rect(screen, 'Grey25', led_2)
+        pygame.draw.rect(screen, 'Grey25', led_1)
 
         # Desenha os botões que correspondem aos... wait for it... botões
-        button_1 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
-        button_2 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
-        button_3 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
-        button_4 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
-        pygame.draw.rect(screen, 'Green', button_1)
-        pygame.draw.rect(screen, 'Yellow', button_2)
-        pygame.draw.rect(screen, 'Red', button_3)
-        pygame.draw.rect(screen, 'Blue', button_4)
+        button_4 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
+        button_3 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
+        button_2 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
+        button_1 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
+        pygame.draw.rect(screen, 'Green', button_4)
+        pygame.draw.rect(screen, 'Yellow', button_3)
+        pygame.draw.rect(screen, 'Red', button_2)
+        pygame.draw.rect(screen, 'Blue', button_1)
+
+        # LEDs
+        if ()
 
 
-        # Caso os botões sejam clicados, acendem o led correspondente
-        if ((click and button_1.collidepoint((mx, my))) or button_state.get(1)):
-                pygame.draw.rect(screen, 'Green', led_1)
+        # Caso os botões sejam clicados, acendem o botao correspondente
+        if ((click and button_1.collidepoint((mx, my))) or button_state.get(4)):
+                pygame.draw.rect(screen, 'Green', led_4)
                 #publique
-        if ((click and button_2.collidepoint((mx, my))) or button_state.get(2)):
-                pygame.draw.rect(screen, 'Yellow', led_2)
-        if ((click and button_3.collidepoint((mx, my))) or button_state.get(3)):
-                pygame.draw.rect(screen, 'Red', led_3)
-        if ((click and button_4.collidepoint((mx, my))) or button_state.get(4)):
-                pygame.draw.rect(screen, 'Blue', led_4)
+        if ((click and button_2.collidepoint((mx, my))) or button_state.get(3)):
+                pygame.draw.rect(screen, 'Yellow', led_3)
+        if ((click and button_3.collidepoint((mx, my))) or button_state.get(2)):
+                pygame.draw.rect(screen, 'Red', led_2)
+        if ((click and button_4.collidepoint((mx, my))) or button_state.get(1)):
+                pygame.draw.rect(screen, 'Blue', led_1)
 
         # if (click and changed):
         #     print ("clicando")
@@ -649,23 +729,23 @@ def game():
                 if (event.key == K_ESCAPE):
                     running = False
                 if (event.key == K_a):
-                    button_state.set(1, True)
-                if (event.key == K_s):
-                    button_state.set(2, True)
-                if (event.key == K_d):
-                    button_state.set(3, True)
-                if (event.key == K_f):
                     button_state.set(4, True)
+                if (event.key == K_s):
+                    button_state.set(3, True)
+                if (event.key == K_d):
+                    button_state.set(2, True)
+                if (event.key == K_f):
+                    button_state.set(1, True)
             # verifica qual tecla foi solta
             if (event.type == KEYUP):
                 if (event.key == K_a):
-                    button_state.set(1, False)
-                if (event.key == K_s):
-                    button_state.set(2, False)
-                if (event.key == K_d):
-                    button_state.set(3, False)
-                if (event.key == K_f):
                     button_state.set(4, False)
+                if (event.key == K_s):
+                    button_state.set(3, False)
+                if (event.key == K_d):
+                    button_state.set(2, False)
+                if (event.key == K_f):
+                    button_state.set(1, False)
             # verifica o mouse
             if (event.type == MOUSEBUTTONDOWN):
                 if (event.button == 1):
