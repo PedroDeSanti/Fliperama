@@ -118,6 +118,10 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(user+"/E3", qos=0) # Botão 0
     client.subscribe(user+"/E2", qos=0) # Iniciar
     client.subscribe(user+"/S4", qos=0)
+    client.subscribe(user+"/S3", qos=0)
+    client.subscribe(user+"/S2", qos=0)
+    client.subscribe(user+"/S1", qos=0)
+    client.subscribe(user+"/S0", qos=0)
     client.subscribe(user+"/TX", qos=0)
 
 # Quando receber uma mensagem (Callback de mensagem)
@@ -150,19 +154,19 @@ def on_message(client, userdata, msg):
         print("Recebi uma mensagem de E2")
 
     elif str(msg.topic) == user+"/S3":
-        button_state.set(3, is_pressed)
+        led_state.set(4, is_pressed)
         print("Recebi uma mensagem de S3")
 
     elif str(msg.topic) == user+"/S2":
-        button_state.set(2, is_pressed)
+        led_state.set(3, is_pressed)
         print("Recebi uma mensagem de S2")
 
     elif str(msg.topic) == user+"/S1":
-        button_state.set(1, is_pressed)
+        led_state.set(2, is_pressed)
         print("Recebi uma mensagem de S1")
 
     elif str(msg.topic) == user+"/S0":
-        button_state.set("iniciar", is_pressed)
+        led_state.set(1, is_pressed)
         print("Recebi uma mensagem de S0")
 
     elif str(msg.topic) == user+"/S4":
@@ -696,7 +700,14 @@ def game():
         pygame.draw.rect(screen, 'Blue', button_1)
 
         # LEDs
-        if ()
+        if (led_state.get(4)):
+            pygame.draw.rect(screen, 'Green', led_4)
+        if (led_state.get(3)):
+            pygame.draw.rect(screen, 'Yellow', led_3)
+        if (led_state.get(2)):
+            pygame.draw.rect(screen, 'Red', led_2)
+        if (led_state.get(1)):
+            pygame.draw.rect(screen, 'Blue', led_1)
 
 
         # Caso os botões sejam clicados, acendem o botao correspondente
@@ -718,6 +729,7 @@ def game():
         # click = False
         # release = False
         changed = False
+        
 
         # Analisa as entradas do teclado para esta tela
         for event in pygame.event.get():
