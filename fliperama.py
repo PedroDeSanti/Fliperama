@@ -719,7 +719,7 @@ def game():
     count = 0
     while (count <= 6):
         screen.fill((0, 0, 0))
-        draw_text('Esperando tx...', 'assets/PressStart2P.ttf', 60, 'Green', screen, WIDTH/2, HEIGH/2)
+        draw_text('Esperando tx...', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, HEIGH/2)
         if (button_state.get("tx")):
             count += 1
             button_state.reset()
