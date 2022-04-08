@@ -179,6 +179,11 @@ def display_img(img, x, y):
 
 # Tela inicial
 def main_menu():
+    # Reseta o circuito 
+    client.publish(user+"/E1", payload="1", qos=0, retain=False)
+    time.sleep(0.2)
+    client.publish(user+"/E1", payload="0", qos=0, retain=False)
+
     click = False
     start = False   
     while True:
@@ -313,22 +318,22 @@ def select_difficulty():
             draw_text('Difficulty '+ str(difficulty), 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, 200)
 
         # desenha os botões correspondentes às dificuldades 
-        dif_1 = pygame.Rect((WIDTH-200)*1/6, 400, 200, 100)
+        dif_1 = pygame.Rect((WIDTH-200)*5/6, 400, 200, 100)
         dif_2 = pygame.Rect((WIDTH-200)*3/6, 400, 200, 100)
-        dif_3 = pygame.Rect((WIDTH-200)*5/6, 400, 200, 100)
+        dif_3 = pygame.Rect((WIDTH-200)*1/6, 400, 200, 100)
         pygame.draw.rect(screen, 'Green', dif_1)
         pygame.draw.rect(screen, 'Yellow', dif_2)
         pygame.draw.rect(screen, 'Red', dif_3)
-        draw_text("Gugu Dadá", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*1/6+100, 450)
+        draw_text("Gugu Dadá", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*5/6+100, 450)
         draw_text("Normal", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*3/6+100, 450)
-        draw_text("Doom", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*5/6+100, 450)
+        draw_text("Doom", 'assets/PressStart2P.ttf', 20, 'Black', screen, (WIDTH-200)*1/6+100, 450)
 
         guguDada = pygame.image.load("assets/pacifier.png")
-        display_img(guguDada, (WIDTH-200)*1/6, 200)
+        display_img(guguDada, (WIDTH-200)*5/6, 200)
         pikachu = pygame.image.load("assets/pikachu.png")
         display_img(pikachu, (WIDTH-200)*3/6+25, 190)
         doomGuy = pygame.image.load("assets/doomGuy3.png")
-        display_img(doomGuy, (WIDTH-200)*5/6+25, 190)
+        display_img(doomGuy, (WIDTH-200)*1/6+25, 190)
 
         # verifica qual dificuldade foi selecionada
         if (dif_1.collidepoint((mx, my))):
@@ -672,7 +677,7 @@ def game():
         draw_text('Press start (or enter)', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, HEIGH/2+60)
         draw_text('to register your name', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, HEIGH/2+80)
 
-        if (button_state.get("iniciar") == 1):
+        if (button_state.get("iniciar") == 1 or iniciar):
             nick = insert_name()
             leader_board = LeaderBoard()
             leader_board.add(nick, 8888, diff)
@@ -682,6 +687,11 @@ def game():
             if (event.type == QUIT):
                 pygame.quit()
                 exit()
+            if (event.type == KEYDOWN):
+                if (event.key == K_ESCAPE):
+                    running = False
+                if (event.key == K_RETURN):
+                    iniciar = True
             # if (event.type == MOUSEBUTTONDOWN):
             #     if (event.button == 1):
             #         click = True
@@ -692,5 +702,8 @@ def game():
         
         pygame.display.update()
         clock.tick(60)
+    client.publish(user+"/E1", payload="1", qos=0, retain=False)
+    time.sleep(0.2)
+    client.publish(user+"/E1", payload="0", qos=0, retain=False)
 
 main_menu()
