@@ -1,4 +1,4 @@
-from tkinter import W
+# from tkinter import W
 from leaderboard import *
 import pygame
 from pygame.locals import *
@@ -68,15 +68,16 @@ class ButtonState:
         self.iniciar = False
         self.pronto = False
 
+leader_board = LeaderBoard()
 
 # Quando conectar na rede (Callback de conexao)
 def on_connect(client, userdata, flags, rc):
     print("Conectado com codigo " + str(rc))
-    client.subscribe(user+"/E6", qos=0)
-    client.subscribe(user+"/E5", qos=0)
-    client.subscribe(user+"/E4", qos=0)
-    client.subscribe(user+"/E3", qos=0)
-    client.subscribe(user+"/E2", qos=0)
+    client.subscribe(user+"/E6", qos=0) # Botão 3
+    client.subscribe(user+"/E5", qos=0) # Botão 2
+    client.subscribe(user+"/E4", qos=0) # Botão 1
+    client.subscribe(user+"/E3", qos=0) # Botão 0
+    client.subscribe(user+"/E2", qos=0) # Iniciar
     client.subscribe(user+"/S4", qos=0)
     client.subscribe(user+"/TX", qos=0)
 
@@ -100,16 +101,17 @@ def on_message(client, userdata, msg):
         print("Recebi uma mensagem de E4")
     elif str(msg.topic) == user+"/E3":
         button_state.set(4, is_pressed)
-        print("Recebi uma mensagem de E2")
+        print("Recebi uma mensagem de E3")
     elif str(msg.topic) == user+"/E2":
         button_state.set("iniciar", is_pressed)
-        print("Recebi uma mensagem de E3")
+        print("Recebi uma mensagem de E2")
     elif str(msg.topic) == user+"/S4":
         button_state.set("pronto", is_pressed)
         print("Recebi uma mensagem de S4")
     elif str(msg.topic) == user+"/TX":
         print("Recebi uma mensagem de TX")
         print(str(msg.payload.decode("utf-8")))
+        leader_board.construct_message(str(msg.payload.decode("utf-8")))
     else:
         print("Erro! Mensagem recebida de tópico estranho")
 
@@ -133,7 +135,7 @@ client.publish(user+"/S0", payload="0", qos=0, retain=False)
 
 # while True:
 #     client.publish(user+"/S0", payload="1", qos=0, retain=False)
-#     time.sleep(2)
+#     time.sleep(0.2)
 #     client.publish(user+"/S0", payload="0", qos=0, retain=False)
 #     time.sleep(2)
 
@@ -253,7 +255,6 @@ def main_menu():
 def leaderboards():
 
     # obtém o ranking para o caso da dificuldade 1                                              MUDAR AQUI DEPOIS
-    leader_board = LeaderBoard()
     scores = leader_board.get(1)
     running = True
 
@@ -461,32 +462,36 @@ def insert_name():
         # vai para a esquerda
         # print("button_1", button_state.get(1), " changed: ", changed)
         if ((click and button_1.collidepoint((mx, my))) or (button_state.get(1))):
+            # client.publish(user+"/E3", payload="1", qos=0, retain=False)
             if (select != 0):
                 select -= 1
+            else: select = 2
         # incrementa o caractere
         if ((click and button_2.collidepoint((mx, my))) or (button_state.get(2))):
+            # client.publish(user+"/E4", payload="1", qos=0, retain=False)
             if (char_index[select] < len(char_list) - 1):
                 char_index[select] += 1
             else:
                 char_index[select] = 0
         # decrementa o caractere
         if ((click and button_3.collidepoint((mx, my))) or (button_state.get(3))):
+            # client.publish(user+"/E5", payload="1", qos=0, retain=False)
             if (char_index[select] > 0):
                 char_index[select] -= 1
             else:
                 char_index[select] = len(char_list) - 1
         # vai para a direita
         if ((click and button_4.collidepoint((mx, my))) or (button_state.get(4))):
+            # client.publish(user+"/E6", payload="1", qos=0, retain=False)
             if (select != 2):
                 select += 1
-
+            else: select = 0
 
         click = False
         button_state.set(1, False)
         button_state.set(2, False)
         button_state.set(3, False)
         button_state.set(4, False)
-        button_state.set("iniciar", False)
         button_state.set("pronto", False)
         
 
@@ -536,7 +541,6 @@ def insert_name():
                     changed = True
                     click = False
                     release = True
-
 
         # # Analisa as entradas do teclado para esta tela
         # for event in pygame.event.get():
@@ -611,6 +615,7 @@ def game():
         # Caso os botões sejam clicados, acendem o led correspondente
         if ((click and button_1.collidepoint((mx, my))) or button_state.get(1)):
                 pygame.draw.rect(screen, 'Green', led_1)
+                #publique
         if ((click and button_2.collidepoint((mx, my))) or button_state.get(2)):
                 pygame.draw.rect(screen, 'Yellow', led_2)
         if ((click and button_3.collidepoint((mx, my))) or button_state.get(3)):
@@ -682,8 +687,6 @@ def game():
 
         if (button_state.get("iniciar") == 1 or iniciar):
             nick = insert_name()
-            leader_board = LeaderBoard()
-            leader_board.add(nick, 8888, diff)
             running = False
 
         for event in pygame.event.get():
@@ -713,6 +716,8 @@ def game():
         count += 1
         pygame.display.update()
         clock.tick(60)
+    
+    leader_board.add()
 
     client.publish(user+"/E1", payload="1", qos=0, retain=False)
     time.sleep(0.2)
