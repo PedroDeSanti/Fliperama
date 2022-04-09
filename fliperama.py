@@ -643,6 +643,9 @@ def insert_name():
                 if (event.key == K_ESCAPE):
                     running = False
                 if (event.key == K_RETURN):
+                    client.publish(user+"/E2", payload="1", qos=0, retain=False)
+                    time.sleep(0.3)
+                    client.publish(user+"/E2", payload="0", qos=0, retain=False)
                     running = False
                 if (event.key == K_a):
                     button_state.set(1, True)
@@ -852,6 +855,10 @@ def game():
         draw_text('to register your name', 'assets/PressStart2P.ttf', 20, 'Green', screen, WIDTH/2, HEIGH/2+80)
 
         if (button_state.get("iniciar") == 1 or iniciar):
+            if(not button_state.get("iniciar")):
+                client.publish(user+"/E2", payload="1", qos=0, retain=False)
+                time.sleep(0.3)
+                client.publish(user+"/E2", payload="0", qos=0, retain=False)
             nick = insert_name()
             running = False
 
