@@ -109,6 +109,19 @@ class ButtonState:
 
 leader_board = LeaderBoard()
 
+def colorI(i):
+    if  i > 10: i = 1
+    if   (i == 1):  return 'cornsilk1'
+    elif (i == 2):  return 'red'
+    elif (i == 3):  return 'burlywood3'
+    elif (i == 4):  return 'burlywood1'
+    elif (i == 5):  return 'bisque2'
+    elif (i == 6):  return 'greenyellow'
+    elif (i == 7):  return 'green3'
+    elif (i == 8):  return 'darkslategray2'
+    elif (i == 9):  return 'darkseagreen2'
+    elif (i == 10): return 'darksalmon'
+
 # Quando conectar na rede (Callback de conexao)
 def on_connect(client, userdata, flags, rc):
     print("Conectado com codigo " + str(rc))
@@ -322,7 +335,8 @@ def main_menu():
 # Tela de ranking (acessado via tela inicial)
 def leaderboards():
 
-    # obtém o ranking para o caso da dificuldade 1                                              MUDAR AQUI DEPOIS
+    displaying_diff = 1
+    diff = 1
     scores = leader_board.get(1)
     running = True
 
@@ -332,30 +346,32 @@ def leaderboards():
         screen.fill((0, 0, 0))
         draw_text('LeaderBoard', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 50)
 
+        button = pygame.Rect(WIDTH, 300, 250, 80)
+
         # Desenha na tela as 11 melhores pontuações
+        draw_text('Rank', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3, 100)
+        draw_text('Name', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3+200, 100)
+        draw_text('Score', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3+400, 100)
         y = 150
-        x = (WIDTH/3)-50
+        x = (WIDTH/3)
         for i in range(1, 12):
-            if (i == 1):
-                position = "1ST"
-            elif (i == 2):
-                position = "2ND"
-            elif (i == 3):
-                position = "3RD"
-            else:
-                position = str(i) + "TH"
-            draw_text(position, 'assets/PressStart2P.ttf', 20, 'Green', screen, x, y)
+            if (i == 1):   draw_text("1ST", 'assets/PressStart2P.ttf', 20, colorI(i), screen, x, y)
+            elif (i == 2): draw_text("2ND", 'assets/PressStart2P.ttf', 20, colorI(i), screen, x, y)
+            elif (i == 3): draw_text("3RD", 'assets/PressStart2P.ttf', 20, colorI(i), screen, x, y)
+            else: draw_text(str(i)+"TH", 'assets/PressStart2P.ttf', 20, colorI(i), screen, x, y)
             y = y + 52
 
         # Escreve o nome e pontuação de cada jogador
         y = 150
+        i = 1
         for player in scores:
-            x = (WIDTH/3)+50
+            x = (WIDTH/3) + 200
             for item in player:
                 # print("player: ", player, " item: ", item)
-                draw_text(str(item), 'assets/PressStart2P.ttf', 20, 'Green', screen, x, y)
+                draw_text(str(item), 'assets/PressStart2P.ttf', 20, colorI(i), screen, x, y)
 
-                x = x + 100
+                x = x + 200
+            i += 1
             y = y + 52
                 
         # Analisa as entradas do teclado para esta tela
@@ -408,12 +424,24 @@ def select_difficulty():
 
         # verifica qual dificuldade foi selecionada
         if ((click and dif_1.collidepoint((mx, my))) or button_state.get(1)):
+            if(not button_state.get(1)):
+                client.publish(user+"/E3", payload="1", qos=0, retain=False)
+                time.sleep(0.3)
+                client.publish(user+"/E3", payload="0", qos=0, retain=False)
             difficulty = 1
             return difficulty
         if ((click and dif_2.collidepoint((mx, my))) or button_state.get(2)):
+            if(not button_state.get(2)):
+                client.publish(user+"/E4", payload="1", qos=0, retain=False)
+                time.sleep(0.3)
+                client.publish(user+"/E4", payload="0", qos=0, retain=False)
             difficulty = 2
             return difficulty
         if ((click and dif_3.collidepoint((mx, my))) or button_state.get(3)):
+            if(not button_state.get(3)):
+                client.publish(user+"/E5", payload="1", qos=0, retain=False)
+                time.sleep(0.3)
+                client.publish(user+"/E5", payload="0", qos=0, retain=False)
             difficulty = 3
             return difficulty
 
@@ -519,25 +547,24 @@ def insert_name():
 
 
         # Desenha os botões que correspondem aos... wait for it... botões
-        button_1 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
-        button_2 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
-        button_3 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
-        button_4 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
-        pygame.draw.rect(screen, 'Grey25', button_1)
-        pygame.draw.rect(screen, 'Grey25', button_2)
-        pygame.draw.rect(screen, 'Grey25', button_3)
+        button_4 = pygame.Rect((WIDTH-150)*1/8, 400, 150, 100)
+        button_3 = pygame.Rect((WIDTH-150)*3/8, 400, 150, 100)
+        button_2 = pygame.Rect((WIDTH-150)*5/8, 400, 150, 100)
+        button_1 = pygame.Rect((WIDTH-150)*7/8, 400, 150, 100)
         pygame.draw.rect(screen, 'Grey25', button_4)
-
+        pygame.draw.rect(screen, 'Grey25', button_3)
+        pygame.draw.rect(screen, 'Grey25', button_2)
+        pygame.draw.rect(screen, 'Grey25', button_1)
 
         # Caso os botões sejam clicados, acendem o led correspondente
-        if ((click and button_1.collidepoint((mx, my))) or button_state.get(1)):
-                pygame.draw.rect(screen, 'Green', button_1)
-        if ((click and button_2.collidepoint((mx, my))) or button_state.get(2)):
-                pygame.draw.rect(screen, 'Yellow', button_2)
-        if ((click and button_3.collidepoint((mx, my))) or button_state.get(3)):
-                pygame.draw.rect(screen, 'Red', button_3)
         if ((click and button_4.collidepoint((mx, my))) or button_state.get(4)):
-                pygame.draw.rect(screen, 'Blue', button_4)
+                pygame.draw.rect(screen, 'Green', button_4)
+        if ((click and button_3.collidepoint((mx, my))) or button_state.get(3)):
+                pygame.draw.rect(screen, 'Yellow', button_3)
+        if ((click and button_2.collidepoint((mx, my))) or button_state.get(2)):
+                pygame.draw.rect(screen, 'Red', button_2)
+        if ((click and button_1.collidepoint((mx, my))) or button_state.get(1)):
+                pygame.draw.rect(screen, 'Blue', button_1)
 
         # if (click and changed):
         #     print ("clicando")
@@ -712,14 +739,32 @@ def game():
 
         # Caso os botões sejam clicados, acendem o botao correspondente
         if ((click and button_1.collidepoint((mx, my))) or button_state.get(4)):
-                pygame.draw.rect(screen, 'Green', led_4)
-                #publique
+            if(not button_state.get(4)):
+                client.publish(user+"/E6", payload="1", qos=0, retain=False)
+                time.sleep(0.3)
+                client.publish(user+"/E6", payload="0", qos=0, retain=False)
+            pygame.draw.rect(screen, 'Green', led_4)
+
         if ((click and button_2.collidepoint((mx, my))) or button_state.get(3)):
-                pygame.draw.rect(screen, 'Yellow', led_3)
+            if(not button_state.get(3)):
+                client.publish(user+"/E5", payload="1", qos=0, retain=False)
+                time.sleep(0.3)
+                client.publish(user+"/E6", payload="0", qos=0, retain=False)
+            pygame.draw.rect(screen, 'Yellow', led_3)
+
         if ((click and button_3.collidepoint((mx, my))) or button_state.get(2)):
-                pygame.draw.rect(screen, 'Red', led_2)
+            if(not button_state.get(2)):
+                client.publish(user+"/E4", payload="1", qos=0, retain=False)
+                time.sleep(0.3)
+                client.publish(user+"/E6", payload="0", qos=0, retain=False)
+            pygame.draw.rect(screen, 'Red', led_2)
+
         if ((click and button_4.collidepoint((mx, my))) or button_state.get(1)):
-                pygame.draw.rect(screen, 'Blue', led_1)
+            if(not button_state.get(1)):
+                client.publish(user+"/E3", payload="1", qos=0, retain=False)
+                time.sleep(0.3)
+                client.publish(user+"/E6", payload="0", qos=0, retain=False)
+            pygame.draw.rect(screen, 'Blue', led_1)
 
         # if (click and changed):
         #     print ("clicando")
