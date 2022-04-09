@@ -334,7 +334,7 @@ def main_menu():
 
 # Tela de ranking (acessado via tela inicial)
 def leaderboards():
-
+    click = False
     displaying_diff = 1
     diff = 1
     scores = leader_board.get(1)
@@ -342,18 +342,24 @@ def leaderboards():
 
     # Enquanto o jogador não aperta ESC
     while running:
+        if (displaying_diff != diff):
+            scores = leader_board.get(diff)
+            displaying_diff = diff
+        # scores = leader_board.get(diff)
         
         screen.fill((0, 0, 0))
-        draw_text('LeaderBoard', 'assets/PressStart2P.ttf', 50, 'Green', screen, WIDTH/2, 50)
+        draw_text('LeaderBoard'+str(diff), 'assets/PressStart2P.ttf', 50, 'White', screen, WIDTH/2, 50)
 
-        button = pygame.Rect(WIDTH, 300, 250, 80)
+        button = pygame.Rect(WIDTH - 150 , 300, 80, 80)
+        pygame.draw.rect(screen, 'Gold', button)
+        draw_text('>', 'assets/PressStart2P.ttf', 40, 'Black', screen, WIDTH - 150 + 40, 340)
 
         # Desenha na tela as 11 melhores pontuações
-        draw_text('Rank', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3, 100)
-        draw_text('Name', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3+200, 100)
-        draw_text('Score', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3+400, 100)
+        draw_text('Rank', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3-50, 100)
+        draw_text('Name', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3+150, 100)
+        draw_text('Score', 'assets/PressStart2P.ttf', 25, 'gold1', screen, WIDTH/3+350, 100)
         y = 150
-        x = (WIDTH/3)
+        x = (WIDTH/3)-50
         for i in range(1, 12):
             if (i == 1):   draw_text("1ST", 'assets/PressStart2P.ttf', 20, colorI(i), screen, x, y)
             elif (i == 2): draw_text("2ND", 'assets/PressStart2P.ttf', 20, colorI(i), screen, x, y)
@@ -365,7 +371,7 @@ def leaderboards():
         y = 150
         i = 1
         for player in scores:
-            x = (WIDTH/3) + 200
+            x = (WIDTH/3) + 150
             for item in player:
                 # print("player: ", player, " item: ", item)
                 draw_text(str(item), 'assets/PressStart2P.ttf', 20, colorI(i), screen, x, y)
@@ -373,7 +379,16 @@ def leaderboards():
                 x = x + 200
             i += 1
             y = y + 52
-                
+
+        mx, my = pygame.mouse.get_pos()
+
+        if ((click and button.collidepoint((mx, my)))):
+            if (diff < 3):
+                diff += 1
+            else:
+                diff = 1
+
+        click = False 
         # Analisa as entradas do teclado para esta tela
         for event in pygame.event.get():
             if (event.type == QUIT):
@@ -382,6 +397,13 @@ def leaderboards():
             if (event.type == KEYDOWN):
                 if (event.key == K_ESCAPE):
                     running = False
+            if (event.type == MOUSEBUTTONDOWN):
+                if (event.button == 1):
+                    click = True
+                    clicking = [mx, my]
+            if (event.type == MOUSEBUTTONUP):
+                if (event.button == 1):
+                    click = False
 
         pygame.display.update()
         clock.tick(60)
@@ -491,7 +513,7 @@ def select_difficulty():
 # Tela de criação de nickname (acessado via tela de jogo)
 def insert_name():
     # difficulty = 0
-    char_list = "AabCcdEFGHIJkLMnOoPqrStUuVWXyZ0123456789"
+    char_list = "AabCcdEFGHhIJkLMnOoPqrStUuVWXyZ0123456789"
     button_state.set(1, False)
     button_state.set(2, False)
     button_state.set(3, False)
@@ -573,27 +595,27 @@ def insert_name():
 
         # vai para a esquerda
         # print("button_1", button_state.get(1), " changed: ", changed)
-        if ((click and button_1.collidepoint((mx, my))) or (button_state.get(1))):
+        if ((click and button_4.collidepoint((mx, my))) or (button_state.get(4))):
             # client.publish(user+"/E3", payload="1", qos=0, retain=False)
             if (select != 0):
                 select -= 1
             else: select = 2
         # incrementa o caractere
-        if ((click and button_2.collidepoint((mx, my))) or (button_state.get(2))):
+        if ((click and button_3.collidepoint((mx, my))) or (button_state.get(3))):
             # client.publish(user+"/E4", payload="1", qos=0, retain=False)
             if (char_index[select] < len(char_list) - 1):
                 char_index[select] += 1
             else:
                 char_index[select] = 0
         # decrementa o caractere
-        if ((click and button_3.collidepoint((mx, my))) or (button_state.get(3))):
+        if ((click and button_2.collidepoint((mx, my))) or (button_state.get(2))):
             # client.publish(user+"/E5", payload="1", qos=0, retain=False)
             if (char_index[select] > 0):
                 char_index[select] -= 1
             else:
                 char_index[select] = len(char_list) - 1
         # vai para a direita
-        if ((click and button_4.collidepoint((mx, my))) or (button_state.get(4))):
+        if ((click and button_1.collidepoint((mx, my))) or (button_state.get(1))):
             # client.publish(user+"/E6", payload="1", qos=0, retain=False)
             if (select != 2):
                 select += 1

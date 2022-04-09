@@ -1,4 +1,3 @@
-from this import d
 from pymongo import MongoClient, DESCENDING
 
 MESSAGE_LENGTH = 7
@@ -17,16 +16,18 @@ class LeaderBoard:
         score_list = []
         
         # Seleciona do BD os valores da dificuldade correspondente, e os coloca em ordem decrescente
-        # lista = list(self.scores.find({"difficulty": difficulty}).sort("score", DESCENDING))
+        lista = list(self.scores.find({"difficulty": str(difficulty)}).sort("score", DESCENDING))
         # For testing
-        lista = list(self.scores.find().sort("score", DESCENDING))
+        # lista = list(self.scores.find().sort("score", DESCENDING))
         # adiciona cada pontuação daquela dificuldade no ranking
         for item in lista:
             for field in item:
                 if (field == 'nick'):
                     player.append(item[field])
+                    #print(item[field])
                 if (field == 'score'):
                     player.append(item[field])
+                    #print(item[field])
             # coloca no ranking nick+score 
             score_list.append(player)
             player = []
@@ -88,14 +89,13 @@ class LeaderBoard:
 
 # For testing:
 
-# leader_board = LeaderBoard()
+#leader_board = LeaderBoard()
+
 # leader_board.clear_all_scores()
-# lista = leader_board.get(1)
 # lista = leader_board.get(2)
 # lista = leader_board.get(3)
-# print(lista)
 
-# leader_board.add("Deg", 9000, 1)
+#leader_board.add("JAO", "3655", "2")
 # leader_board.add("lol", 6500, 1)
 # leader_board.add("Lin", 1700, 1)
 # leader_board.add("Aux", 12000, 1)
